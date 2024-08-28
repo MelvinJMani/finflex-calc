@@ -1,0 +1,59 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+.header {
+  display: flex;
+  align-items: stretch;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  float: left;
+  background-image: url('/src/assets/Calc2.svg');
+  background-position: left center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  padding-left: 3%;
+}
+
+.logo-text {
+  font-size: 16px;
+  color: white;
+  white-space: nowrap;
+  outline: none;
+  border: none;
+  font-family: Courier, monospace;
+  font-weight: bold;
+}
+
+.iMessage {
+  border: 1px solid green;
+}
+
+.custom-card {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  padding-left: 8%;
+  padding-top: 0;
+}
+
+.custom-card .content {
+  height: 50%;
+  overflow: hidden;
+  color: #000;
+  margin-bottom: 10%;
+}
+
+.custom-card .icon {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+}

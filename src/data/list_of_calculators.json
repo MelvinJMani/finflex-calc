@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "Long Term Investment",
+    "link": "long_term",
+    "description": "Calculate how much your investment will grow over a long period, taking into account compound interest and regular contributions.",
+    "icon": "long_term"
+  },
+  {
+    "id": 2,
+    "name": "SIP",
+    "link": "sip",
+    "description": "Determine how much you need to invest or how much you will grow your savings with your SIP, factoring in consistent contributions and projected returns.",
+    "icon": "sip"
+  },
+  {
+    "id": 3,
+    "name": "SWP",
+    "link": "swp",
+    "description": "Determine how much you can withdraw periodically from your investments and how long your funds will last.",
+    "icon": "swp"
+  },
+  {
+    "id": 4,
+    "name": "Step Up SIP",
+    "link": "step_up",
+    "description": "Calculate how much you will accumulate with a Step Up SIP, where your investments increase periodically, enhancing your returns over time.",
+    "icon": "step_up"
+  },
+  {
+    "id": 5,
+    "name": "Lumpsum",
+    "link": "lumpsum",
+    "description": "Estimate the future value of a one-time lumpsum investment based on expected returns and investment duration.",
+    "icon": "lumpsum"
+  },
+  {
+    "id": 6,
+    "name": "SSY",
+    "link": "ssy",
+    "description": "Calculate the maturity amount and returns for investments made under the SSY scheme, tailored for the financial security of a girl child.",
+    "icon": "ssy"
+  }
+]
