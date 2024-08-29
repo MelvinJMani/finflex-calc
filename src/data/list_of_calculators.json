@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Long Term Investment",
+    "name": "Long Term",
     "link": "long_term",
     "description": "Calculate how much your investment will grow over a long period, taking into account compound interest and regular contributions.",
     "icon": "long_term"

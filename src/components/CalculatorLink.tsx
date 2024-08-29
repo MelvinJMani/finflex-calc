@@ -35,8 +35,8 @@ const CalculatorLink: React.FC<CalculatorLinkProps> = ({
   const iconPath = icon ? iconMap[icon] : null;
   return (
     <Col className="gutter-row" span={6}>
-      <a href={link}>
-        <Card hoverable style={{ width: 240, minHeight: 300 }}>
+      <a href={`/calculator/${link}`}>
+        <Card hoverable style={{ width: 280, minHeight: 300 }}>
           <Meta avatar={<Avatar shape="square" size={64} src={iconPath} />} title={title} description={description} />
         </Card>
       </a>
