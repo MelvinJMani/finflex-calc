@@ -8,18 +8,22 @@ export const getCalculatorByName = (name: string) => {
 
 // Utility functions to manage favorites in localStorage
 export const toggleFavorite = (name: string): boolean => {
-    const favorites = getFavorites();
-    
-    if (favorites.includes(name)) {
-        // Remove the name if it's already a favorite
-        const updatedFavorites = favorites.filter(fav => fav !== name);
-        saveFavorites(updatedFavorites);
-        return true;
-    } else {
-        // Add the name if it's not already a favorite
-        favorites.push(name);
-        saveFavorites(favorites);
-        return true;
+    try {
+        const favorites = getFavorites();
+        
+        if (favorites.includes(name)) {
+            // Remove the name if it's already a favorite
+            const updatedFavorites = favorites.filter(fav => fav !== name);
+            saveFavorites(updatedFavorites);
+            return true;
+        } else {
+            // Add the name if it's not already a favorite
+            favorites.push(name);
+            saveFavorites(favorites);
+            return true;
+        }
+    }catch(error){
+        return false;
     }
 }
 
