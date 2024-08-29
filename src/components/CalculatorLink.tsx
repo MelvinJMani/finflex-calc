@@ -1,6 +1,7 @@
 import { Avatar, Card, Col } from 'antd';
 const { Meta } = Card;
-
+import { useNavigate } from 'react-router-dom';
+import FavoriteButton from '../components/FavoriteButton';
 import longTermIcon from '../assets/icons/long_term.webp';
 import sipIcon from '../assets/icons/sip.webp';
 import swpIcon from '../assets/icons/swp.webp';
@@ -32,14 +33,13 @@ const CalculatorLink: React.FC<CalculatorLinkProps> = ({
   link,
   icon
 }) => {
+  const navigate = useNavigate();
   const iconPath = icon ? iconMap[icon] : null;
   return (
     <Col className="gutter-row" span={6}>
-      <a href={`/calculator/${link}`}>
-        <Card hoverable style={{ width: 280, minHeight: 300 }}>
-          <Meta avatar={<Avatar shape="square" size={64} src={iconPath} />} title={title} description={description} />
-        </Card>
-      </a>
+      <Card hoverable style={{ width: 280, minHeight: 300 }} onClick={() => navigate(`/calculator/${link}`)}>
+        <Meta avatar={<Avatar shape="square" size={64} src={iconPath} />} title={ <> {title} <FavoriteButton name={link} />  </>} description={description} />
+      </Card>
     </Col>
   );
 };

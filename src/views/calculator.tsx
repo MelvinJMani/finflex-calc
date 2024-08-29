@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getCalculatorByName, isFavorite, toggleFavorite } from '../utils';
+import { getCalculatorByName } from '../utils';
 import { Button, Flex, Divider, Typography, Tooltip } from 'antd';
-import { RollbackOutlined, StarOutlined, StarFilled } from '@ant-design/icons';
+import { RollbackOutlined } from '@ant-design/icons';
+import FavoriteButton from '../components/FavoriteButton';
 
 const { Title, Paragraph } = Typography;
 
@@ -14,12 +14,6 @@ const boxStyle: React.CSSProperties = {
 const Calculator: React.FC = () => {
   const { name = '' } = useParams();
   const calculator = getCalculatorByName(name);
-  const [favorite, setFavorite] = useState<boolean>(isFavorite(name));
-
-  const handleToggleFavorite = () => {
-    toggleFavorite(name);
-    setFavorite(isFavorite(name));  // Update the state based on the current favorite status
-  };
 
   return (
     <>
@@ -28,13 +22,7 @@ const Calculator: React.FC = () => {
           <Button icon={<RollbackOutlined />} type="dashed" href='/'/>
         </Tooltip>
         <Title level={2}>{`${calculator?.name} Calculator`}</Title>
-        <Tooltip title={ favorite ? "Remove from favorites" : "Add to favorites"  } color="#001529">
-          <Button
-            icon={favorite ? <StarFilled /> : <StarOutlined />}
-            type="dashed"
-            onClick={handleToggleFavorite}
-          />
-        </Tooltip>
+        <FavoriteButton name={name} />
       </Flex>
       <Divider />
       <Paragraph>
