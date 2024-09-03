@@ -55,8 +55,34 @@ const longTermSchema = yup.object().shape({
   }),
 });
 
+const sipSchema = yup.object().shape({
+  amount: yup
+    .number()
+    .typeError('Amount must be a number')
+    .required('Amount is required')
+    .min(1, 'Amount must be at least 1'),
+  sipFrequency: yup.string().when('lumpSumOrSIP', ([lumpSumOrSIP], schema) => {
+    return lumpSumOrSIP
+      ? schema.required('SIP Frequency is required')
+      : schema.notRequired();
+  }),
+  expectedReturn: yup
+    .number()
+    .typeError('Expected Return must be a number')
+    .required('Expected Return is required')
+    .min(1, 'Expected Return must be at least 1')
+    .max(30, 'Expected Return cannot exceed 30'),
+  investmentPeriod: yup
+    .number()
+    .typeError('Investment Period must be a number')
+    .required('Investment Period is required')
+    .min(1, 'Investment Period must be at least 1 years')
+    .max(50, 'Investment Period cannot exceed 50 years'),
+});
+
 const schemaMap: Record<string, yup.AnyObjectSchema> = {
   long_term: longTermSchema,
+  sip: sipSchema
 };
 
 export default schemaMap;

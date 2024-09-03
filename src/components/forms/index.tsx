@@ -1,4 +1,5 @@
 import LongTermForm from './LongTermForm';
+import SIPForm from './SIPForm';
 import { ResultDataItem } from '../../views/calculator';
 import schemaMap from './validation';
 import { AnyObjectSchema } from 'yup';
@@ -17,6 +18,7 @@ type FormComponentProps = ChildFormProps & { schema: AnyObjectSchema };
 
 const formMap: Record<string, React.FC<FormComponentProps>> = {
   long_term: LongTermForm,
+  sip: SIPForm
 };
 
 const DynamicFormLoader: React.FC<FormProps> = ({ form, onResult }) => {

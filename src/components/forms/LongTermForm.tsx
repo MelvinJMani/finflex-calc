@@ -17,7 +17,7 @@ import {
   calculateSIPReturn,
   calculateSIPReturnWithStepUp,
   adjustAmount,
-  calculateSWPReturn
+  calculateSWPReturn,
 } from '../../utils';
 
 interface FormValues {
@@ -37,7 +37,7 @@ interface FormValues {
   inflationRate?: number;
   expenseRatio?: number;
   swpFrequency?: string;
-  swpPeriod? : number;
+  swpPeriod?: number;
 }
 
 const FREQUENCIES = [
@@ -62,7 +62,7 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
     swpExpectedReturn: 12,
     swpPeriod: 10,
     swpFrequency: 'monthly',
-    withdrawal: 10000
+    withdrawal: 10000,
   };
 
   const { control, handleSubmit, watch } = useForm<FormValues>({
@@ -92,7 +92,7 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
       swpExpectedReturn = 0,
       swpPeriod = 0,
       swpFrequency = 'monthly',
-      withdrawal= 0
+      withdrawal = 0,
     } = data;
     const result: ResultDataItem[] = [];
     const investmentType: InvestmentType = getInvestmentType(
@@ -174,11 +174,16 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
         label: 'Final Value (After tax & expense ratio, adjusted to inflation)',
       });
     }
-    console.log("hello");
     //If SWP is enabled
     if (swp) {
-      const amount = ( advanceOptions ? adjustedFinalValue : totalValue ) ?? 0;
-      const { remainingBalance = 0, totalWithdrawn = 0 } = calculateSWPReturn(amount, withdrawal, swpPeriod, swpExpectedReturn, swpFrequency);
+      const amount = (advanceOptions ? adjustedFinalValue : totalValue) ?? 0;
+      const { remainingBalance = 0, totalWithdrawn = 0 } = calculateSWPReturn(
+        amount,
+        withdrawal,
+        swpPeriod,
+        swpExpectedReturn,
+        swpFrequency,
+      );
       result.push({
         value: totalWithdrawn,
         label: 'Total Withdrawal',
