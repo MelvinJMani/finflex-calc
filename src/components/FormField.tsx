@@ -7,7 +7,7 @@ const { Option } = Select;
 type OptionType = {
   label: string;
   value: string | number;
-}
+};
 
 type BaseFormFieldProps = {
   name: string;
@@ -16,7 +16,7 @@ type BaseFormFieldProps = {
   label?: string;
   onChange?: (value: string | number | boolean) => void;
   options?: OptionType[];
-  showPercentage?: boolean,
+  showPercentage?: boolean;
   [key: string]: unknown;
 };
 
@@ -74,10 +74,10 @@ const FormField: React.FC<FormFieldProps> = ({
               min={(rest.min as number) ?? 0}
               max={(rest.max as number) ?? 100}
               value={value as number}
-              onChange={(val) => handleChange(val !== null ? val : 0)}
+              onChange={val => handleChange(val !== null ? val : 0)}
               style={{ marginLeft: 8 }}
-              formatter={(value) => showPercentage ? `${value}%` : `${value}`}
-              parser={(value) => value ? parseFloat(value.replace('%', '')) : 0}
+              formatter={value => (showPercentage ? `${value}%` : `${value}`)}
+              parser={value => (value ? parseFloat(value.replace('%', '')) : 0)}
             />
           </div>
         );
@@ -85,14 +85,22 @@ const FormField: React.FC<FormFieldProps> = ({
         return (
           <div style={{ display: 'flex', alignItems: 'center' }}>
             <span style={{ marginRight: 8 }}>{noLabel as string}</span>
-            <Switch {...rest} checked={value as boolean} onChange={handleChange as (val: boolean) => void} />
+            <Switch
+              {...rest}
+              checked={value as boolean}
+              onChange={handleChange as (val: boolean) => void}
+            />
             <span style={{ marginLeft: 8 }}>{yesLabel as string}</span>
           </div>
         );
       case 'select':
         return (
-          <Select {...rest} value={value as string | number} onChange={handleChange}>
-            {options.map((option) => (
+          <Select
+            {...rest}
+            value={value as string | number}
+            onChange={handleChange}
+          >
+            {options.map(option => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>
@@ -101,12 +109,22 @@ const FormField: React.FC<FormFieldProps> = ({
         );
       case 'text':
       default:
-        return <Input {...rest} value={value as string} onChange={(e) => handleChange(e.target.value)} />;
+        return (
+          <Input
+            {...rest}
+            value={value as string}
+            onChange={e => handleChange(e.target.value)}
+          />
+        );
     }
   };
 
   return (
-    <Form.Item label={label} help={error?.message} validateStatus={error ? 'error' : ''}>
+    <Form.Item
+      label={label}
+      help={error?.message}
+      validateStatus={error ? 'error' : ''}
+    >
       {renderField()}
     </Form.Item>
   );

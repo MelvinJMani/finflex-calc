@@ -5,6 +5,7 @@ import { Button, Row, Col, Flex, Typography, Tooltip, Divider } from 'antd';
 import { RollbackOutlined } from '@ant-design/icons';
 import FavoriteButton from '../components/FavoriteButton';
 import DynamicFormLoader from '../components/forms';
+import ResultView from '../components/ResultView';
 
 const { Title, Paragraph } = Typography;
 
@@ -27,11 +28,11 @@ export type ResultDataItem = {
 const Calculator: React.FC = () => {
   const { name = '' } = useParams();
   const calculator = getCalculatorByName(name);
-  const [result, setResult] = useState<string | null>(null);
+  const [results, setResults] = useState<ResultDataItem[]>([]);
 
   const showResult = (result: ResultDataItem[]) => {
     // Handle the form submission and set the result
-    setResult(`Calculated Result: ${JSON.stringify(result)}`);
+    setResults(result);
 
     // Scroll to result area in mobile view
     if (window.innerWidth <= 768) {
@@ -39,12 +40,24 @@ const Calculator: React.FC = () => {
       if (resultArea) {
         resultArea.scrollIntoView({ behavior: 'smooth' });
       }
+    }else {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
     }
   };
 
   return (
     <>
-      <Flex gap="middle" vertical={false} style={boxStyle} justify="flex-start" align="center">
+      <Flex
+        gap="middle"
+        vertical={false}
+        style={boxStyle}
+        justify="flex-start"
+        align="center"
+      >
         <Tooltip title="Go back" color="#001529">
           <Button icon={<RollbackOutlined />} type="dashed" href="/" />
         </Tooltip>
@@ -57,17 +70,14 @@ const Calculator: React.FC = () => {
       </Paragraph>
       <Row gutter={[16, 16]} justify="center">
         <Col xs={24} md={12}>
-          <div>
+          <div id="result-area" style={resultAreaStyle}>
             <DynamicFormLoader form={name} onResult={showResult} />
           </div>
         </Col>
         <Col xs={24} md={12}>
-          {result && (
-            <div id="result-area" style={resultAreaStyle}>
-              <Title level={4}>Result</Title>
-              <Paragraph>{result}</Paragraph>
-            </div>
-          )}
+          <div id="result-area" style={resultAreaStyle}>
+            <ResultView results={results} /> 
+          </div>
         </Col>
       </Row>
     </>

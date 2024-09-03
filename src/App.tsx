@@ -12,7 +12,7 @@ const router = createBrowserRouter([
     path: '/calculator/:name',
     element: <Calculator />,
     caseSensitive: true,
-  }
+  },
 ]);
 
 const App: React.FC = () => {

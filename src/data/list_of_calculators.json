@@ -40,5 +40,12 @@
     "link": "ssy",
     "description": "Calculate the maturity amount and returns for investments made under the SSY scheme, tailored for the financial security of a girl child.",
     "icon": "ssy"
+  },
+  {
+    "id": 7,
+    "name": "CAGR",
+    "link": "cagr",
+    "description": "Calculate the Compound Annual Growth Rate (CAGR) and Extended Internal Rate of Return (XIRR) for investments made through Systematic Investment Plans (SIP), tailored to your specified frequency and time frame.",
+    "icon": "cagr"
   }
 ]

@@ -1,6 +1,6 @@
 import { Row } from 'antd';
 import data from '../data/list_of_calculators.json';
-import CalculatorLink , { IconKeys } from './CalculatorLink';
+import CalculatorLink, { IconKeys } from './CalculatorLink';
 
 const Calculators: React.FC = () => (
   <Row gutter={[16, 24]}>
