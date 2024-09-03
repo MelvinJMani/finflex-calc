@@ -59,7 +59,6 @@ export const getInvestmentType = (isSIP: boolean, isStepUpSIP: boolean) : Invest
   }else {
     investmentType = InvestmentType.LUMPSUM;
   }
-  console.log(isSIP, isStepUpSIP, investmentType);
   return investmentType;
 }
 
