@@ -222,14 +222,9 @@ export const calculateSIPReturnWithStepUp = (
 
   for (let i = 0; i < timeFrame; i++) {
     currentSIPAmount += (currentSIPAmount * stepUpPercentage) / 100;
-    console.log(`Year ${i+1} - ${currentSIPAmount}`)
   }
 
-  console.log(totalInvestment, "totalInvestment", totalReturn);
-
   const estimatedReturn = totalReturn - totalInvestment;
-
-  console.log(estimatedReturn, "estimatedReturn")
-
+  
   return Math.round(estimatedReturn);
 };
