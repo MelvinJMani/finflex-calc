@@ -40,11 +40,11 @@ const Calculator: React.FC = () => {
       if (resultArea) {
         resultArea.scrollIntoView({ behavior: 'smooth' });
       }
-    }else {
+    } else {
       window.scrollTo({
         top: 0,
         left: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       });
     }
   };
@@ -74,9 +74,13 @@ const Calculator: React.FC = () => {
             <DynamicFormLoader form={name} onResult={showResult} />
           </div>
         </Col>
+
         <Col xs={24} md={12}>
-          <div id="result-area" style={resultAreaStyle}>
-            <ResultView results={results} /> 
+          <div
+            id="result-area"
+            style={results.length > 0 ? resultAreaStyle : {}}
+          >
+            <ResultView results={results} />
           </div>
         </Col>
       </Row>

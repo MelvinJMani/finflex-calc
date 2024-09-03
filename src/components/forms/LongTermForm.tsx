@@ -6,7 +6,16 @@ import { ChildFormProps } from '.';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { AnyObjectSchema } from 'yup';
 import { ResultDataItem } from '../../views/calculator';
-import { getInvestmentType, InvestmentType, calculateTotalInvestment, calculateTotalInvestmentWithStepUp } from '../../utils';
+import {
+  getInvestmentType,
+  InvestmentType,
+  calculateTotalInvestment,
+  calculateTotalInvestmentWithStepUp,
+  calculateLumpsumReturnAmount,
+  calculateTax,
+  calculateExpenseRatio,
+  adjustAmount,
+} from '../../utils';
 
 interface FormValues {
   isSIP: boolean;
@@ -21,8 +30,8 @@ interface FormValues {
   monthlyWithdrawal?: number;
   swpExpectedReturn?: number;
   advanceOptions?: boolean;
-  taxRate?: number; 
-  inflationRate?: number; 
+  taxRate?: number;
+  inflationRate?: number;
   expenseRatio?: number;
 }
 
@@ -35,15 +44,16 @@ const FREQUENCIES = [
 
 const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
   schema,
-  onResult
+  onResult,
 }) => {
   const defaultValues = {
+    amount: 1000,
     isSIP: false,
     expectedReturn: 12,
     investmentPeriod: 15,
     swp: false,
     swpExpectedReturn: 12,
-    advanceOptions: false
+    advanceOptions: false,
   };
   const { control, handleSubmit, watch } = useForm<FormValues>({
     defaultValues,
@@ -52,27 +62,91 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
 
   const watchSIP = watch('isSIP');
   const watchSipType = watch('isStepUpSIP');
-  const watchSWP = watch('swp');  
+  const watchSWP = watch('swp');
   const watchAdvanceOptions = watch('advanceOptions');
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmit = (data: FormValues) => {
-    const { amount, isSIP, isStepUpSIP, sipFrequency = "monthly", investmentPeriod, stepUpPercentage = 0 } = data;
+    const {
+      amount,
+      isSIP,
+      isStepUpSIP,
+      sipFrequency = 'monthly',
+      investmentPeriod,
+      stepUpPercentage = 0,
+      expectedReturn,
+      advanceOptions = false,
+      taxRate = 0,
+      inflationRate = 0,
+      expenseRatio = 0,
+    } = data;
     const result: ResultDataItem[] = [];
-    const investmentType:InvestmentType = getInvestmentType(isSIP, isStepUpSIP ?? false);
-    //Total Amount
-    let totalAmount ;
-    if(investmentType === InvestmentType.LUMPSUM){
-      totalAmount = amount ?? 0;
-    }else if(investmentType === InvestmentType.SIP) {
-      totalAmount = calculateTotalInvestment(amount, investmentPeriod ,  sipFrequency);
-    }else if (investmentType === InvestmentType.STEPUP_SIP){
-      totalAmount = calculateTotalInvestmentWithStepUp(amount, investmentPeriod, sipFrequency, stepUpPercentage);
+    const investmentType: InvestmentType = getInvestmentType(
+      isSIP,
+      isStepUpSIP ?? false,
+    );
+    let invested,
+      estimatedReturn,
+      taxAmount,
+      expenseRatioValue,
+      adjustedFinalValue;
+    if (investmentType === InvestmentType.LUMPSUM) {
+      invested = amount ?? 0;
+      estimatedReturn = calculateLumpsumReturnAmount(
+        amount,
+        investmentPeriod,
+        expectedReturn,
+      );
+    } else if (investmentType === InvestmentType.SIP) {
+      invested = calculateTotalInvestment(
+        amount,
+        investmentPeriod,
+        sipFrequency,
+      );
+    } else if (investmentType === InvestmentType.STEPUP_SIP) {
+      invested = calculateTotalInvestmentWithStepUp(
+        amount,
+        investmentPeriod,
+        sipFrequency,
+        stepUpPercentage,
+      );
     }
     result.push({
-      value: Math.round(totalAmount ?? 0), 
-      label: "Total Investment"
+      value: Math.round(invested ?? 0),
+      label: 'Total Investment',
     });
+    result.push({
+      value: Math.round(estimatedReturn ?? 0),
+      label: 'Estimated Return',
+    });
+    const totalValue =
+      Math.round(estimatedReturn ?? 0) + Math.round(invested ?? 0);
+    result.push({
+      value: totalValue,
+      label: 'Total Value',
+    });
+    if (advanceOptions) {
+      taxAmount = calculateTax(totalValue, taxRate);
+      result.push({
+        value: taxAmount,
+        label: 'Tax Calculated',
+      });
+      expenseRatioValue = calculateExpenseRatio(totalValue, expenseRatio);
+      result.push({
+        value: expenseRatioValue,
+        label: 'Expense Ratio Calculated',
+      });
+      adjustedFinalValue = adjustAmount(
+        totalValue,
+        inflationRate,
+        expenseRatio,
+        taxRate,
+      );
+      result.push({
+        value: adjustedFinalValue,
+        label: 'Final Value (After tax & expense ratio, adjusted to inflation)',
+      });
+    }
     onResult(result);
   };
 
@@ -174,14 +248,18 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
             label="SWP Frequency"
             options={FREQUENCIES}
           />
-
         </>
       )}
 
-      <FormField name="advanceOptions" control={control} type="switch" label="Advanced Options" />
+      <FormField
+        name="advanceOptions"
+        control={control}
+        type="switch"
+        label="Advanced Options"
+      />
 
       {watchAdvanceOptions && (
-        <> 
+        <>
           <FormField
             name="taxRate"
             control={control}
@@ -197,7 +275,7 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
             label="Rate of Inflation (%)"
             min={0}
             max={10}
-            step={.1}
+            step={0.1}
           />
           <FormField
             name="expenseRatio"
@@ -206,7 +284,7 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
             label="Expense Ratio (%)"
             min={0}
             max={5}
-            step={.1}
+            step={0.1}
           />
         </>
       )}

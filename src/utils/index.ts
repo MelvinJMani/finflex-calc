@@ -43,24 +43,26 @@ function saveFavorites(favorites: string[]): void {
   localStorage.setItem(BOOKMARK_KEY, JSON.stringify(favorites));
 }
 
-
-export enum InvestmentType { 
+export enum InvestmentType {
   LUMPSUM = 0,
-  SIP= 1,
-  STEPUP_SIP = 2
+  SIP = 1,
+  STEPUP_SIP = 2,
 }
 
-export const getInvestmentType = (isSIP: boolean, isStepUpSIP: boolean) : InvestmentType => {
-  let investmentType ;
-  if(isSIP && !isStepUpSIP) {
+export const getInvestmentType = (
+  isSIP: boolean,
+  isStepUpSIP: boolean,
+): InvestmentType => {
+  let investmentType;
+  if (isSIP && !isStepUpSIP) {
     investmentType = InvestmentType.SIP;
-  }else if(isSIP && isStepUpSIP){
-      investmentType = InvestmentType.STEPUP_SIP;
-  }else {
+  } else if (isSIP && isStepUpSIP) {
+    investmentType = InvestmentType.STEPUP_SIP;
+  } else {
     investmentType = InvestmentType.LUMPSUM;
   }
   return investmentType;
-}
+};
 
 export const frequencyMap: { [key: string]: number } = {
   weekly: 52,
@@ -72,7 +74,7 @@ export const frequencyMap: { [key: string]: number } = {
 export const calculateTotalInvestment = (
   sipAmount: number,
   numberOfYears: number,
-  sipFrequency: keyof typeof frequencyMap
+  sipFrequency: keyof typeof frequencyMap,
 ): number => {
   const frequencyMultiplier = frequencyMap[sipFrequency];
   const totalInvestment = sipAmount * frequencyMultiplier * numberOfYears;
@@ -83,7 +85,7 @@ export const calculateTotalInvestmentWithStepUp = (
   sipAmount: number,
   numberOfYears: number,
   sipFrequency: keyof typeof frequencyMap,
-  stepUpPercentage: number
+  stepUpPercentage: number,
 ): number => {
   const frequencyMultiplier = frequencyMap[sipFrequency];
   let totalInvestment = 0;
@@ -97,8 +99,8 @@ export const calculateTotalInvestmentWithStepUp = (
   return totalInvestment;
 };
 
-export const formatRupeeAmount = (amount: number| string): string => {
-  if(typeof amount === 'string'){
+export const formatRupeeAmount = (amount: number | string): string => {
+  if (typeof amount === 'string') {
     amount = parseFloat(amount);
   }
   return new Intl.NumberFormat('en-IN', {
@@ -106,4 +108,58 @@ export const formatRupeeAmount = (amount: number| string): string => {
     currency: 'INR',
     minimumFractionDigits: 2,
   }).format(amount);
+};
+
+export const calculateLumpsumReturnAmount = (
+  principalAmount: number,
+  timeFrame: number,
+  expectedReturnRate: number,
+): number => {
+  // Compound interest formula: A = P(1 + r/n)^(nt)
+  // Assuming compounding occurs annually (n=1)
+  const totalAmount =
+    principalAmount * Math.pow(1 + expectedReturnRate / 100, timeFrame);
+
+  // Calculate the return amount minus the invested amount (total return - principal)
+  const estimatedReturn = totalAmount - principalAmount;
+
+  return Math.round(estimatedReturn);
+};
+
+export const calculateTax = (amount: number, taxPercentage: number): number => {
+  // Calculate the tax amount
+  const taxAmount = amount * (taxPercentage / 100);
+
+  return Math.round(taxAmount);
+};
+
+export const calculateExpenseRatio = (
+  finalValue: number,
+  expenseRatioPercentage: number,
+): number => {
+  // Calculate the expense ratio amount
+  const expenseAmount = finalValue * (expenseRatioPercentage / 100);
+
+  return Math.round(expenseAmount);
+};
+
+export const adjustAmount = (
+  amount: number,
+  inflationRate: number,
+  expenseRatioPercentage: number,
+  taxPercentage: number,
+): number => {
+  // Calculate the expense ratio amount
+  const expenseAmount = amount * (expenseRatioPercentage / 100);
+
+  // Calculate the tax amount
+  const taxAmount = amount * (taxPercentage / 100);
+
+  // Subtract the expense and tax from the amount
+  let adjustedAmount = amount - expenseAmount - taxAmount;
+
+  // Adjust the remaining amount for inflation
+  adjustedAmount = adjustedAmount * (1 - inflationRate / 100);
+
+  return Math.round(adjustedAmount);
 };

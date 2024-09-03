@@ -16,8 +16,8 @@ export type IconKeys =
   | 'swp'
   | 'step_up'
   | 'ssy'
-  | 'lumpsum' 
-  | 'cagr' ;
+  | 'lumpsum'
+  | 'cagr';
 
 const iconMap: Record<IconKeys, string> = {
   long_term: longTermIcon,
@@ -26,7 +26,7 @@ const iconMap: Record<IconKeys, string> = {
   step_up: stepUpIcon,
   ssy: ssyIcon,
   lumpsum: lumpsumIcon,
-  cagr: cagr
+  cagr: cagr,
 };
 
 type CalculatorLinkProps = {
