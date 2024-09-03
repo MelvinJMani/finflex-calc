@@ -14,9 +14,10 @@ import {
   calculateLumpsumReturnAmount,
   calculateTax,
   calculateExpenseRatio,
-  calculateSIPReturn, 
+  calculateSIPReturn,
   calculateSIPReturnWithStepUp,
   adjustAmount,
+  calculateSWPReturn
 } from '../../utils';
 
 interface FormValues {
@@ -29,12 +30,14 @@ interface FormValues {
   expectedReturn: number;
   investmentPeriod: number;
   swp?: boolean;
-  monthlyWithdrawal?: number;
+  withdrawal?: number;
   swpExpectedReturn?: number;
   advanceOptions?: boolean;
   taxRate?: number;
   inflationRate?: number;
   expenseRatio?: number;
+  swpFrequency?: string;
+  swpPeriod? : number;
 }
 
 const FREQUENCIES = [
@@ -49,14 +52,19 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
   onResult,
 }) => {
   const defaultValues = {
-    amount: 1000,
+    amount: 25000,
     isSIP: false,
     expectedReturn: 12,
-    investmentPeriod: 15,
+    investmentPeriod: 10,
+    sipFrequency: 'monthly',
     swp: false,
-    swpExpectedReturn: 12,
     advanceOptions: false,
+    swpExpectedReturn: 12,
+    swpPeriod: 10,
+    swpFrequency: 'monthly',
+    withdrawal: 10000
   };
+
   const { control, handleSubmit, watch } = useForm<FormValues>({
     defaultValues,
     resolver: yupResolver(schema),
@@ -67,7 +75,6 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
   const watchSWP = watch('swp');
   const watchAdvanceOptions = watch('advanceOptions');
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSubmit = (data: FormValues) => {
     const {
       amount,
@@ -81,6 +88,11 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
       taxRate = 0,
       inflationRate = 0,
       expenseRatio = 0,
+      swp = false,
+      swpExpectedReturn = 0,
+      swpPeriod = 0,
+      swpFrequency = 'monthly',
+      withdrawal= 0
     } = data;
     const result: ResultDataItem[] = [];
     const investmentType: InvestmentType = getInvestmentType(
@@ -94,14 +106,37 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
       adjustedFinalValue;
     if (investmentType === InvestmentType.LUMPSUM) {
       invested = amount ?? 0;
-      estimatedReturn = calculateLumpsumReturnAmount(amount,investmentPeriod,expectedReturn);
+      estimatedReturn = calculateLumpsumReturnAmount(
+        amount,
+        investmentPeriod,
+        expectedReturn,
+      );
     } else if (investmentType === InvestmentType.SIP) {
-      invested = calculateTotalInvestment(amount,investmentPeriod,sipFrequency);
-      console.log(amount);
-      estimatedReturn = calculateSIPReturn(amount, investmentPeriod, expectedReturn, sipFrequency);
+      invested = calculateTotalInvestment(
+        amount,
+        investmentPeriod,
+        sipFrequency,
+      );
+      estimatedReturn = calculateSIPReturn(
+        amount,
+        investmentPeriod,
+        expectedReturn,
+        sipFrequency,
+      );
     } else if (investmentType === InvestmentType.STEPUP_SIP) {
-      invested = calculateTotalInvestmentWithStepUp(amount,investmentPeriod,sipFrequency,stepUpPercentage);
-      estimatedReturn = calculateSIPReturnWithStepUp(amount,investmentPeriod, expectedReturn, sipFrequency, stepUpPercentage);
+      invested = calculateTotalInvestmentWithStepUp(
+        amount,
+        investmentPeriod,
+        sipFrequency,
+        stepUpPercentage,
+      );
+      estimatedReturn = calculateSIPReturnWithStepUp(
+        amount,
+        investmentPeriod,
+        expectedReturn,
+        sipFrequency,
+        stepUpPercentage,
+      );
     }
     result.push({
       value: Math.round(invested ?? 0),
@@ -137,6 +172,20 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
       result.push({
         value: adjustedFinalValue,
         label: 'Final Value (After tax & expense ratio, adjusted to inflation)',
+      });
+    }
+    console.log("hello");
+    //If SWP is enabled
+    if (swp) {
+      const amount = ( advanceOptions ? adjustedFinalValue : totalValue ) ?? 0;
+      const { remainingBalance = 0, totalWithdrawn = 0 } = calculateSWPReturn(amount, withdrawal, swpPeriod, swpExpectedReturn, swpFrequency);
+      result.push({
+        value: totalWithdrawn,
+        label: 'Total Withdrawal',
+      });
+      result.push({
+        value: remainingBalance,
+        label: 'Final Value after withdrawal',
       });
     }
     onResult(result);
@@ -216,10 +265,10 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
       {watchSWP && (
         <>
           <FormField
-            name="monthlyWithdrawal"
+            name="withdrawal"
             control={control}
             type="text"
-            label="Monthly Withdrawal"
+            label="Withdrawal"
             inputMode="numeric"
             pattern="[0-9]*"
           />
@@ -239,6 +288,16 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
             type="select"
             label="SWP Frequency"
             options={FREQUENCIES}
+          />
+
+          <FormField
+            name="swpPeriod"
+            control={control}
+            type="slider"
+            label="Period of SWP (Years)"
+            min={1}
+            max={50}
+            showPercentage={false}
           />
         </>
       )}

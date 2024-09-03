@@ -36,7 +36,7 @@ const longTermSchema = yup.object().shape({
     .min(1, 'Investment Period must be at least 1 years')
     .max(50, 'Investment Period cannot exceed 50 years'),
   swp: yup.boolean(),
-  monthlyWithdrawal: yup.number().when('swp', ([swp], schema) => {
+  withdrawal: yup.number().when('swp', ([swp], schema) => {
     return swp
       ? schema
           .typeError('Monthly Withdrawal must be a number')

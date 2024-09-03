@@ -170,7 +170,7 @@ export const calculateSIPReturn = (
   sipAmount: number,
   timeFrame: number,
   expectedReturnRate: number,
-  sipFrequency: Frequency
+  sipFrequency: Frequency,
 ): number => {
   const frequencyMultiplier = frequencyMap[sipFrequency];
   const totalPeriods = timeFrame * frequencyMultiplier;
@@ -195,8 +195,8 @@ export const calculateSIPReturnWithStepUp = (
   sipAmount: number,
   timeFrame: number,
   expectedReturnRate: number,
-  sipFrequency: keyof typeof frequencyMap,
-  stepUpPercentage: number
+  sipFrequency: Frequency,
+  stepUpPercentage: number,
 ): number => {
   const frequencyMultiplier = frequencyMap[sipFrequency];
   const totalPeriods = timeFrame * frequencyMultiplier;
@@ -207,7 +207,8 @@ export const calculateSIPReturnWithStepUp = (
 
   for (let i = 0; i < totalPeriods; i++) {
     // Calculate the future value of each SIP installment
-    const futureValue = currentSIPAmount * Math.pow(1 + periodRate, totalPeriods - i);
+    const futureValue =
+      currentSIPAmount * Math.pow(1 + periodRate, totalPeriods - i);
     totalReturn += futureValue;
 
     // Apply step-up at the start of each year (after 12 contributions)
@@ -217,7 +218,12 @@ export const calculateSIPReturnWithStepUp = (
   }
 
   // Total investment calculation should include the correct SIP amounts after step-ups
-  const totalInvestment = calculateTotalInvestmentWithStepUp(sipAmount, timeFrame, sipFrequency, stepUpPercentage);
+  const totalInvestment = calculateTotalInvestmentWithStepUp(
+    sipAmount,
+    timeFrame,
+    sipFrequency,
+    stepUpPercentage,
+  );
   currentSIPAmount = sipAmount;
 
   for (let i = 0; i < timeFrame; i++) {
@@ -225,6 +231,43 @@ export const calculateSIPReturnWithStepUp = (
   }
 
   const estimatedReturn = totalReturn - totalInvestment;
-  
+
   return Math.round(estimatedReturn);
+};
+
+export const calculateSWPReturn = (
+  investmentAmount: number,
+  swpAmount: number,
+  timeFrame: number,
+  expectedReturnRate: number,
+  swpFrequency: Frequency,
+): { remainingBalance: number; totalWithdrawn: number } => {
+  const frequencyMultiplier = frequencyMap[swpFrequency];
+  const totalPeriods = timeFrame * frequencyMultiplier;
+  const periodRate = expectedReturnRate / (100 * frequencyMultiplier);
+
+  let remainingBalance = investmentAmount;
+  let totalWithdrawn = 0;
+
+  for (let i = 0; i < totalPeriods; i++) {
+    // Apply the return to the remaining balance
+    remainingBalance += remainingBalance * periodRate;
+
+    // Subtract the SWP amount
+    remainingBalance -= swpAmount;
+
+    // Accumulate the total withdrawn amount
+    totalWithdrawn += swpAmount;
+
+    // If the remaining balance becomes zero or negative, stop the calculation
+    if (remainingBalance <= 0) {
+      remainingBalance = 0;
+      break;
+    }
+  }
+
+  return {
+    remainingBalance: Math.round(remainingBalance),
+    totalWithdrawn: Math.round(totalWithdrawn),
+  };
 };
