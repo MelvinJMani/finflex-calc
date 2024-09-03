@@ -70,6 +70,8 @@ export const frequencyMap: { [key: string]: number } = {
   quarterly: 4,
   annually: 1,
 };
+type Frequency = keyof typeof frequencyMap;
+
 //Result calculation functions
 export const calculateTotalInvestment = (
   sipAmount: number,
@@ -162,4 +164,72 @@ export const adjustAmount = (
   adjustedAmount = adjustedAmount * (1 - inflationRate / 100);
 
   return Math.round(adjustedAmount);
+};
+
+export const calculateSIPReturn = (
+  sipAmount: number,
+  timeFrame: number,
+  expectedReturnRate: number,
+  sipFrequency: Frequency
+): number => {
+  const frequencyMultiplier = frequencyMap[sipFrequency];
+  const totalPeriods = timeFrame * frequencyMultiplier;
+  const periodRate = expectedReturnRate / (100 * frequencyMultiplier);
+
+  let totalReturn = 0;
+
+  for (let i = 0; i < totalPeriods; i++) {
+    // Calculate the future value of each SIP installment
+    const futureValue = sipAmount * Math.pow(1 + periodRate, totalPeriods - i);
+    totalReturn += futureValue;
+  }
+
+  // Subtract the total investment to get the estimated return
+  const totalInvestment = sipAmount * totalPeriods;
+  const estimatedReturn = totalReturn - totalInvestment;
+
+  return Math.round(estimatedReturn);
+};
+
+export const calculateSIPReturnWithStepUp = (
+  sipAmount: number,
+  timeFrame: number,
+  expectedReturnRate: number,
+  sipFrequency: keyof typeof frequencyMap,
+  stepUpPercentage: number
+): number => {
+  const frequencyMultiplier = frequencyMap[sipFrequency];
+  const totalPeriods = timeFrame * frequencyMultiplier;
+  const periodRate = expectedReturnRate / (100 * frequencyMultiplier);
+
+  let totalReturn = 0;
+  let currentSIPAmount = sipAmount;
+
+  for (let i = 0; i < totalPeriods; i++) {
+    // Calculate the future value of each SIP installment
+    const futureValue = currentSIPAmount * Math.pow(1 + periodRate, totalPeriods - i);
+    totalReturn += futureValue;
+
+    // Apply step-up at the start of each year (after 12 contributions)
+    if ((i + 1) % frequencyMultiplier === 0) {
+      currentSIPAmount += (currentSIPAmount * stepUpPercentage) / 100;
+    }
+  }
+
+  // Total investment calculation should include the correct SIP amounts after step-ups
+  const totalInvestment = calculateTotalInvestmentWithStepUp(sipAmount, timeFrame, sipFrequency, stepUpPercentage);
+  currentSIPAmount = sipAmount;
+
+  for (let i = 0; i < timeFrame; i++) {
+    currentSIPAmount += (currentSIPAmount * stepUpPercentage) / 100;
+    console.log(`Year ${i+1} - ${currentSIPAmount}`)
+  }
+
+  console.log(totalInvestment, "totalInvestment", totalReturn);
+
+  const estimatedReturn = totalReturn - totalInvestment;
+
+  console.log(estimatedReturn, "estimatedReturn")
+
+  return Math.round(estimatedReturn);
 };

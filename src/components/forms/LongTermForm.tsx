@@ -14,6 +14,8 @@ import {
   calculateLumpsumReturnAmount,
   calculateTax,
   calculateExpenseRatio,
+  calculateSIPReturn, 
+  calculateSIPReturnWithStepUp,
   adjustAmount,
 } from '../../utils';
 
@@ -92,24 +94,14 @@ const LongTermForm: React.FC<ChildFormProps & { schema: AnyObjectSchema }> = ({
       adjustedFinalValue;
     if (investmentType === InvestmentType.LUMPSUM) {
       invested = amount ?? 0;
-      estimatedReturn = calculateLumpsumReturnAmount(
-        amount,
-        investmentPeriod,
-        expectedReturn,
-      );
+      estimatedReturn = calculateLumpsumReturnAmount(amount,investmentPeriod,expectedReturn);
     } else if (investmentType === InvestmentType.SIP) {
-      invested = calculateTotalInvestment(
-        amount,
-        investmentPeriod,
-        sipFrequency,
-      );
+      invested = calculateTotalInvestment(amount,investmentPeriod,sipFrequency);
+      console.log(amount);
+      estimatedReturn = calculateSIPReturn(amount, investmentPeriod, expectedReturn, sipFrequency);
     } else if (investmentType === InvestmentType.STEPUP_SIP) {
-      invested = calculateTotalInvestmentWithStepUp(
-        amount,
-        investmentPeriod,
-        sipFrequency,
-        stepUpPercentage,
-      );
+      invested = calculateTotalInvestmentWithStepUp(amount,investmentPeriod,sipFrequency,stepUpPercentage);
+      estimatedReturn = calculateSIPReturnWithStepUp(amount,investmentPeriod, expectedReturn, sipFrequency, stepUpPercentage);
     }
     result.push({
       value: Math.round(invested ?? 0),
